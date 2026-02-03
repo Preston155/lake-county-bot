@@ -185,12 +185,10 @@ client.on("guildMemberRemove", member => {
 client.on("messageCreate", async message => {
   if (message.author.bot || !message.guild) return;
 
-  if (message.content === "!ticketpanel") {
+  if (message.content !== "!ticketpanel") return;
+
   if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator))
     return message.reply("❌ Admins only.");
-
- // if (message.channel.id !== TICKET_PANEL_CHANNEL_ID)
-   // return message.reply("❌ Use this command in the ticket panel channel.");
 
   const embed = new EmbedBuilder()
     .setTitle("🎫 LAKE COUNTY ROLEPLAY — ASSISTANCE")
@@ -214,17 +212,31 @@ client.on("messageCreate", async message => {
       .setCustomId("ticket_select")
       .setPlaceholder("Request Assistance...")
       .addOptions(
-        Object.entries(TICKET_CATEGORIES).map(([id, c]) => ({
-          label: c.label,
-          description: c.description,
-          value: id,
-          emoji: c.emoji
-        }))
+        {
+          label: "👥 General Support",
+          description: "General inquiries, concerns, reports",
+          value: "general"
+        },
+        {
+          label: "🤝 Partnership Support",
+          description: "Partnership & staff partnership requests",
+          value: "partnership"
+        },
+        {
+          label: "🛡️ Internal Affairs",
+          description: "Staff reports & appeals",
+          value: "internal"
+        },
+        {
+          label: "🛠️ Management Support",
+          description: "Store purchases & high-rank inquiries",
+          value: "management"
+        }
       )
   );
 
-  return message.channel.send({ embeds: [embed], components: [menu] });
-}
+  await message.channel.send({ embeds: [embed], components: [menu] });
+});
 
   /* ⚠️ WARN USER */
 if (message.content.startsWith("!warn")) {
