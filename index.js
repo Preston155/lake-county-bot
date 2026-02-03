@@ -586,7 +586,7 @@ if (message.content.startsWith("!giveaway")) {
       .setDescription(
         "**Session Poll!**\n\n" +
         "Click below if you can attend.\n\n" +
-        "**🟢 6+ votes needed**"
+        "**🟢 5+ votes needed**"
       )
       .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
       .setColor(0x00BFFF);
@@ -603,7 +603,7 @@ if (message.content.startsWith("!giveaway")) {
     );
 
     const msg = await message.channel.send({
-      content: "@everyone",
+      content: "@here",
       embeds: [embed],
       components: [row],
       allowedMentions: { parse: ["everyone"] }
