@@ -276,6 +276,7 @@ if (message.content === "!testboost") {
 
 /* 📝 APPLICATIONS PANEL */
 if (message.content === "!applications") {
+  // Role check
   if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
     return message.reply("❌ You are not authorized to use this command.");
 
@@ -308,11 +309,12 @@ if (message.content === "!applications") {
       .setURL("https://YOUR_APPLICATION_LINK_HERE")
   );
 
-  message.channel.send({
+  await message.channel.send({
     embeds: [embed],
     components: [row]
   });
 }
+
 
   /* 🎉 GIVEAWAY */
 if (message.content.startsWith("!giveaway")) {
