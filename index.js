@@ -1,4 +1,3 @@
-console.log("RUNNING THIS FILE:", __filename);
 require("dotenv").config();
 const {
   Client,
@@ -406,6 +405,11 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
       embeds: [embed]
     });
   }
+});
+
+const STAFF_ROLE_ID = "1282417060391161978";
+const TICKET_CATEGORY_ID = "1461009005798359204";
+const TICKET_LOG_CHANNEL_ID = "1461010272444747867";
 
 /* 🚨 SERVER LOCKDOWN */
 if (message.content.startsWith("!lockdown")) {
