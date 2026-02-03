@@ -274,39 +274,45 @@ if (message.content === "!testboost") {
   });
 }
 
-/* 🤖 BOT INFO */
-if (message.content === "!botinfo") {
-  const now = Date.now();
-  const readyAt = client.readyAt?.getTime() ?? now;
-  const diff = now - readyAt;
-
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
-  const minutes = Math.floor((diff % 3600000) / 60000);
+/* 📝 APPLICATIONS PANEL */
+if (message.content === "!applications") {
+  if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
+    return message.reply("❌ You are not authorized to use this command.");
 
   const embed = new EmbedBuilder()
-    .setTitle("🤖 Bot Information")
+    .setTitle("📋 Lake County Roleplay Applications")
     .setDescription(
-      "**Bot Name:** Lake County RP Bot\n" +
-      `**Developer:** ${message.author.tag}\n\n` +
+      "When creating an application, we require a few important key details. " +
+      "You can find all required information listed below, as well as on our application.\n\n" +
 
-      "**📊 Stats:**\n" +
-      `Servers: **${client.guilds.cache.size}**\n` +
-      `Users: **${client.users.cache.size}**\n` +
-      `Uptime: **${days}d ${hours}h ${minutes}m**\n\n` +
+      "**Requirements:**\n" +
+      "• You must be **13 years of age or older**.\n" +
+      "• Have a **basic understanding of ER:LC commands and features**.\n" +
+      "• A **basic understanding of spelling, punctuation, and grammar**.\n" +
+      "• Have the ability to **complete a minimum of 4 hours per week**.\n" +
+      "• No **major negative history** with **Lake County Roleplay**.\n" +
+      "• Ability to **write your own application without assistance from AI**.\n\n" +
 
-      "**⚙️ Tech:**\n" +
-      "Library: **discord.js v14**\n" +
-      "Language: **Node.js**"
+      "⚠️ **Important Notice:**\n" +
+      "Do **not** ask for your application to be reviewed. Doing so will result in **automatic denial**."
     )
-    .setThumbnail(client.user.displayAvatarURL())
-    .setColor(0x5865F2)
-    .setFooter({ text: "Lake County Roleplay" })
+    .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
+    .setColor(0x00BFFF)
+    .setFooter({ text: "Lake County Roleplay • Applications" })
     .setTimestamp();
 
-  message.channel.send({ embeds: [embed] });
-}
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setLabel("📎 Apply Here")
+      .setStyle(ButtonStyle.Link)
+      .setURL("https://YOUR_APPLICATION_LINK_HERE")
+  );
 
+  message.channel.send({
+    embeds: [embed],
+    components: [row]
+  });
+}
 
   /* 🎉 GIVEAWAY */
 if (message.content.startsWith("!giveaway")) {
