@@ -460,12 +460,17 @@ if (message.content === "!sessionpoll") {
   if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
     return message.reply("❌ You are not authorized to use this command.");
 
+  // Clear previous session poll data
+  if (lastSessionPollMessageId) {
+    sessionPolls.delete(lastSessionPollMessageId);
+  }
+
   const embed = new EmbedBuilder()
     .setTitle("📊 Session Poll")
     .setDescription(
       "**Session Poll!**\n\n" +
       "A session poll has been initiated, please react below whether you'll be able to attend this session or not.\n\n" +
-      "**🟢 5+ ticks needed for the session to start**"
+      "**🟢 6+ ticks needed for the session to start**"
     )
     .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
     .setColor(0x00BFFF)
@@ -485,16 +490,17 @@ if (message.content === "!sessionpoll") {
   const row = new ActionRowBuilder().addComponents(voteButton, viewButton);
 
   const pollMessage = await message.channel.send({
-    content: "@here",
+    content: "@everyone",
     embeds: [embed],
     components: [row],
     allowedMentions: { parse: ["everyone"] }
   });
 
-sessionPolls.set(pollMessage.id, new Set());
-lastSessionPollMessageId = pollMessage.id;
-
+  // Create a fresh voter set for this poll
+  sessionPolls.set(pollMessage.id, new Set());
+  lastSessionPollMessageId = pollMessage.id;
 }
+
 
 
 /* 🔻 SERVER SHUTDOWN */
