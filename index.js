@@ -199,6 +199,8 @@ client.on("messageCreate", async (message) => {
   client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
+    if (!message.member.roles.cache.has("ROLE_ID_HERE")) return;
+
   // 🔹 SESSION POLL COMMAND
   if (message.content === "!sessionpoll") {
     const embed = new EmbedBuilder()
