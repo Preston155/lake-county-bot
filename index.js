@@ -38,6 +38,7 @@ const LOCKDOWN_LOG_CHANNEL_ID = "1461008751749234740";
 
 const WELCOME_CHANNEL_ID = "1460994169697730560";
 const LEAVE_CHANNEL_ID = "1460994659848421377";
+const ANNOUNCEMENT_ROLE_ID = "1310976402430103562";
 
 /* ================= COUNTING ================= */
 let countingChannelId = null;
@@ -307,8 +308,8 @@ if (message.content.startsWith("!giveaway")) {
 
 /* 📊 SESSION POLL */
 if (message.content === "!sessionpoll") {
-  if (!message.member.roles.cache.has(STAFF_ROLE_ID))
-    return message.reply("❌ Staff only command.");
+  if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
+    return message.reply("❌ You are not authorized to use this command.");
 
   const embed = new EmbedBuilder()
     .setTitle("📊 Session Poll")
@@ -328,14 +329,14 @@ if (message.content === "!sessionpoll") {
     allowedMentions: { parse: ["everyone"] }
   });
 
-  await pollMessage.react("✅"); // attending
-  await pollMessage.react("❌"); // not attending
+  await pollMessage.react("✅");
+  await pollMessage.react("❌");
 }
 
 /* 🔻 SERVER SHUTDOWN */
 if (message.content === "!ssd") {
-  if (!message.member.roles.cache.has(STAFF_ROLE_ID))
-    return message.reply("❌ Staff only command.");
+  if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
+    return message.reply("❌ You are not authorized to use this command.");
 
   const embed = new EmbedBuilder()
     .setTitle("🔻 Server Shutdown!")
@@ -347,17 +348,18 @@ if (message.content === "!ssd") {
       "Server Owner: **MiningMavenYT**"
     )
     .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
-    .setColor(0xE74C3C) // red shutdown color
+    .setColor(0xE74C3C)
     .setFooter({ text: "Lake County Roleplay" })
     .setTimestamp();
 
   message.channel.send({ embeds: [embed] });
 }
 
+
 /* 🟢 SERVER STARTUP */
 if (message.content === "!ssu") {
-  if (!message.member.roles.cache.has(STAFF_ROLE_ID))
-    return message.reply("❌ Staff only command.");
+  if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
+    return message.reply("❌ You are not authorized to use this command.");
 
   const embed = new EmbedBuilder()
     .setTitle("🟢 Server Startup!")
@@ -370,7 +372,7 @@ if (message.content === "!ssu") {
       "*Those who reacted must join*"
     )
     .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
-    .setColor(0x2ECC71) // green = startup
+    .setColor(0x2ECC71)
     .setFooter({ text: "Lake County Roleplay" })
     .setTimestamp();
 
@@ -380,10 +382,10 @@ if (message.content === "!ssu") {
     allowedMentions: { roles: ["1468213717035384882"] }
   });
 
-  // Optional reactions (people can react if they’re joining)
   await startupMessage.react("✅");
   await startupMessage.react("❌");
 }
+
 
   /* 🔢 COUNTING LOGIC */
   if (message.channel.id === countingChannelId) {
