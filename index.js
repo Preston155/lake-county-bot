@@ -192,6 +192,45 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 client.on("messageCreate", async (message) => {
   if (message.author.bot || !message.guild) return;
 
+/* 📝 APPLICATIONS PANEL */
+if (message.content === "!applications") {
+
+  const embed = new EmbedBuilder()
+    .setTitle("📋 Lake County Roleplay Applications")
+    .setDescription(
+      "When creating an application, we require a few important key details. " +
+      "You can find all required information listed below, as well as on our application.\n\n" +
+
+      "**Requirements:**\n" +
+      "• You must be **13 years of age or older**.\n" +
+      "• Have a **basic understanding of ER:LC commands and features**.\n" +
+      "• A **basic understanding of spelling, punctuation, and grammar**.\n" +
+      "• Have the ability to **complete a minimum of 4 hours per week**.\n" +
+      "• No **major negative history** with **Lake County Roleplay**.\n" +
+      "• Ability to **write your own application without assistance from AI**.\n\n" +
+
+      "⚠️ **Important Notice:**\n" +
+      "Do **not** ask for your application to be reviewed. Doing so will result in **automatic denial**."
+    )
+    .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
+    .setColor(0x00BFFF)
+    .setFooter({ text: "Lake County Roleplay • Applications" })
+    .setTimestamp();
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setLabel("📎 Apply Here")
+      .setStyle(ButtonStyle.Link)
+      .setURL("https://YOUR_APPLICATION_LINK_HERE")
+  );
+
+  await message.channel.send({
+    embeds: [embed],
+    components: [row]
+  });
+}
+
+
   /* 🚨 LOCKDOWN */
   if (message.content.startsWith("!lockdown")) {
     if (!message.member.roles.cache.has(LOCKDOWN_ROLE_ID))
@@ -273,48 +312,6 @@ if (message.content === "!testboost") {
     embeds: [embed]
   });
 }
-
-/* 📝 APPLICATIONS PANEL */
-if (message.content === "!applications") {
-  // Role check
-  // if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
-    // return message.reply("❌ You are not authorized to use this command.");
-
-  const embed = new EmbedBuilder()
-    .setTitle("📋 Lake County Roleplay Applications")
-    .setDescription(
-      "When creating an application, we require a few important key details. " +
-      "You can find all required information listed below, as well as on our application.\n\n" +
-
-      "**Requirements:**\n" +
-      "• You must be **13 years of age or older**.\n" +
-      "• Have a **basic understanding of ER:LC commands and features**.\n" +
-      "• A **basic understanding of spelling, punctuation, and grammar**.\n" +
-      "• Have the ability to **complete a minimum of 4 hours per week**.\n" +
-      "• No **major negative history** with **Lake County Roleplay**.\n" +
-      "• Ability to **write your own application without assistance from AI**.\n\n" +
-
-      "⚠️ **Important Notice:**\n" +
-      "Do **not** ask for your application to be reviewed. Doing so will result in **automatic denial**."
-    )
-    .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
-    .setColor(0x00BFFF)
-    .setFooter({ text: "Lake County Roleplay • Applications" })
-    .setTimestamp();
-
-  const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setLabel("📎 Apply Here")
-      .setStyle(ButtonStyle.Link)
-      .setURL("https://YOUR_APPLICATION_LINK_HERE")
-  );
-
-  await message.channel.send({
-    embeds: [embed],
-    components: [row]
-  });
-}
-
 
   /* 🎉 GIVEAWAY */
 if (message.content.startsWith("!giveaway")) {
