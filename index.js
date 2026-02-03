@@ -842,56 +842,56 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-/* 📊 SESSION POLL BUTTONS */
-if (
-  interaction.customId === "sessionpoll_vote" ||
-  interaction.customId === "sessionpoll_view"
-) {
-  // Always guarantee a fresh voter set
-  let voters = sessionPolls.get(interaction.message.id);
-  if (!voters) {
-    voters = new Set();
-    sessionPolls.set(interaction.message.id, voters);
-  }
+  /* 📊 SESSION POLL BUTTONS */
+  if (
+    interaction.customId === "sessionpoll_vote" ||
+    interaction.customId === "sessionpoll_view"
+  ) {
+    // Always guarantee a voter set for this message
+    let voters = sessionPolls.get(interaction.message.id);
+    if (!voters) {
+      voters = new Set();
+      sessionPolls.set(interaction.message.id, voters);
+    }
 
-  // ✅ VOTE
-  if (interaction.customId === "sessionpoll_vote") {
-    if (voters.has(interaction.user.id)) {
+    // ✅ VOTE BUTTON
+    if (interaction.customId === "sessionpoll_vote") {
+      if (voters.has(interaction.user.id)) {
+        return interaction.reply({
+          content: "❌ You have already voted.",
+          ephemeral: true
+        });
+      }
+
+      voters.add(interaction.user.id);
+      const count = voters.size;
+
+      const updatedRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId("sessionpoll_vote")
+          .setLabel(`✅ Attend (${count}/5)`)
+          .setStyle(ButtonStyle.Success)
+          .setDisabled(count >= 5),
+        new ButtonBuilder()
+          .setCustomId("sessionpoll_view")
+          .setLabel("👀 View Votes")
+          .setStyle(ButtonStyle.Secondary)
+      );
+
+      return interaction.update({ components: [updatedRow] });
+    }
+
+    // 👀 VIEW VOTES BUTTON
+    if (interaction.customId === "sessionpoll_view") {
+      const list =
+        [...voters].map(id => `<@${id}>`).join("\n") || "No votes yet.";
+
       return interaction.reply({
-        content: "❌ You have already voted.",
+        content: `**Voters (${voters.size}/5):**\n${list}`,
         ephemeral: true
       });
     }
-
-    voters.add(interaction.user.id);
-    const count = voters.size;
-
-    const updatedRow = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId("sessionpoll_vote")
-        .setLabel(`✅ Attend (${count}/5)`)
-        .setStyle(ButtonStyle.Success)
-        .setDisabled(count >= 5),
-      new ButtonBuilder()
-        .setCustomId("sessionpoll_view")
-        .setLabel("👀 View Votes")
-        .setStyle(ButtonStyle.Secondary)
-    );
-
-    return interaction.update({ components: [updatedRow] });
   }
-
-  // 👀 VIEW VOTES
-  if (interaction.customId === "sessionpoll_view") {
-    const list =
-      [...voters].map(id => `<@${id}>`).join("\n") || "No votes yet.";
-
-    return interaction.reply({
-      content: `**Voters (${voters.size}/5):**\n${list}`,
-      ephemeral: true
-    });
-  }
-}
 
 /* ================= SAFE SHUTDOWN ================= */
 process.on("SIGINT", () => { saveData(); process.exit(); });
