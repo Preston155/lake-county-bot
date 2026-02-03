@@ -376,16 +376,12 @@ if (message.content === "!ssu") {
     .setFooter({ text: "Lake County Roleplay" })
     .setTimestamp();
 
-  const startupMessage = await message.channel.send({
+  message.channel.send({
     content: `<@&1468213717035384882>`,
     embeds: [embed],
     allowedMentions: { roles: ["1468213717035384882"] }
   });
-
-  await startupMessage.react("✅");
-  await startupMessage.react("❌");
 }
-
 
   /* 🔢 COUNTING LOGIC */
   if (message.channel.id === countingChannelId) {
