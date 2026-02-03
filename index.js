@@ -39,6 +39,8 @@ const LOCKDOWN_LOG_CHANNEL_ID = "1461008751749234740";
 const WELCOME_CHANNEL_ID = "1460994169697730560";
 const LEAVE_CHANNEL_ID = "1460994659848421377";
 const BOOST_CHANNEL_ID = "1467596304900292869";
+const SSU_PING_ROLE_ID = "PUT_ROLE_ID_HERE";
+
 
 /* ================= STORAGE ================= */
 const DATA_FILE = path.join(__dirname, "data.json");
@@ -611,32 +613,50 @@ if (message.content.startsWith("!giveaway")) {
     lastSessionPollMessageId = msg.id;
   }
 
-  /* 🚨 SSU */
-  if (message.content === "!ssu") {
-    if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
-      return message.reply("❌ Unauthorized.");
+/* 🚨 SERVER STARTUP */
+if (message.content === "!ssu") {
+  if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
+    return message.reply("❌ You are not authorized to use this command.");
 
-    const voters = sessionPolls.get(lastSessionPollMessageId);
-    if (!voters || voters.size === 0)
-      return message.reply("❌ No votes.");
-
-    const embed = new EmbedBuilder()
-      .setTitle("🚨 Server Startup!")
-      .setDescription(
-        "**Server Information:**\n" +
-        "Game Code: **ILCRPC**\n" +
-        "Server Owner: **MiningMavenYT**\n\n" +
-        "*Those who voted must join*"
-      )
-      .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
-      .setColor(0x2ECC71);
-
-    message.channel.send({
-      content: [...voters].map(id => `<@${id}>`).join(" "),
-      embeds: [embed],
-      allowedMentions: { users: [...voters] }
-    });
+  if (!lastSessionPollMessageId || !sessionPolls.has(lastSessionPollMessageId)) {
+    return message.reply("❌ No active session poll found.");
   }
+
+  const voters = sessionPolls.get(lastSessionPollMessageId);
+
+  if (!voters.size) {
+    return message.reply("❌ No one voted in the session poll.");
+  }
+
+  // Build mentions
+  const userMentions = [...voters].map(id => `<@${id}>`).join(" ");
+  const roleMention = `<@&${SSU_PING_ROLE_ID}>`;
+
+  const embed = new EmbedBuilder()
+    .setTitle("🚨 Server Startup!")
+    .setDescription(
+      "**Server Startup!**\n" +
+      "*A game session has begun. To join, just read the details provided below.*\n\n" +
+      "**Server Information:**\n" +
+      "Game Code: **ILCRPC**\n" +
+      "Server Owner: **MiningMavenYT**\n\n" +
+      "*Those who reacted must join*"
+    )
+    .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
+    .setColor(0x2ECC71)
+    .setFooter({ text: "Lake County Roleplay" })
+    .setTimestamp();
+
+  await message.channel.send({
+    content: `${roleMention}\n${userMentions}`,
+    embeds: [embed],
+    allowedMentions: {
+      roles: [SSU_PING_ROLE_ID],
+      users: [...voters]
+    }
+  });
+}
+
 
   /* 🔻 SSD */
   if (message.content === "!ssd") {
