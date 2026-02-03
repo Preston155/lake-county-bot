@@ -14,7 +14,6 @@ const fs = require("fs");
 const path = require("path");
 
 /* ================= CLIENT ================= */
-/* ================= CLIENT ================= */
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -69,6 +68,25 @@ function saveData() {
     warnings
   }, null, 2));
 }
+
+const SELF_ROLE_CONFIG = {
+  announce: {
+    label: "📣 Announcement Notification",
+    roleId: "1468272674928328818"
+  },
+  session: {
+    label: "🎮 Session Notification",
+    roleId: "1468213717035384882"
+  },
+  giveaway: {
+    label: "🎉 Giveaway Notification",
+    roleId: "1468272960472354960"
+  },
+  chat: {
+    label: "💬 Active Chat Notification",
+    roleId: "1468273029980356812"
+  }
+};
 
 /* ================= READY ================= */
 client.once("ready", async () => {
@@ -286,6 +304,38 @@ if (message.content.startsWith("!warn")) {
     `📄 Reason: ${reason}\n` +
     `📊 Total warnings: **${warnings[user.id].length}**`
   );
+}
+
+if (cmd === "!rolesetup") {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator))
+    return message.reply("❌ Admins only.");
+
+  const embed = new EmbedBuilder()
+    .setTitle("📢 LAKE COUNTY ROLEPLAY — NOTIFICATIONS")
+    .setDescription(
+      "Select a role below to get notified whenever something happens.\n" +
+      "You can manage the pings you receive for sessions and announcements at any time.\n\n" +
+      "**Available Notifications:**\n" +
+      "• 📣 Announcement Notification\n" +
+      "• 🎮 Session Notification\n" +
+      "• 🎉 Giveaway Notification\n" +
+      "• 💬 Active Chat Notification\n\n" +
+      "_You will be roled instantly after clicking one of the buttons below._"
+    )
+    .setColor(0x00BFFF)
+    .setImage(
+      "https://media.discordapp.net/attachments/1442342822299566174/1466612239116013791/West_Virginia_Roleplay_5.png"
+    )
+    .setFooter({ text: "Lake County Roleplay" });
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId("role_announce").setEmoji("📣").setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId("role_session").setEmoji("🎮").setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId("role_giveaway").setEmoji("🎉").setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId("role_chat").setEmoji("💬").setStyle(ButtonStyle.Secondary)
+  );
+
+  return message.channel.send({ embeds: [embed], components: [row] });
 }
 
 /* 📋 VIEW WARNINGS */
