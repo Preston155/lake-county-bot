@@ -306,28 +306,53 @@ if (message.content.startsWith("!giveaway")) {
   }
 
 /* 📊 SESSION POLL */
-if (message.content === "!ssupoll") {
+if (message.content === "!sessionpoll") {
   if (!message.member.roles.cache.has(STAFF_ROLE_ID))
     return message.reply("❌ Staff only command.");
 
   const embed = new EmbedBuilder()
     .setTitle("📊 Session Poll")
-    .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
     .setDescription(
       "**Session Poll!**\n\n" +
       "A session poll has been initiated, please react below whether you'll be able to attend this session or not.\n\n" +
       "**🟢 6+ ticks needed for the session to start**"
     )
+    .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
     .setColor(0x00BFFF)
     .setFooter({ text: "Lake County Roleplay" })
     .setTimestamp();
 
-  const pollMessage = await message.channel.send({ embeds: [embed] });
+  const pollMessage = await message.channel.send({
+    content: "@everyone",
+    embeds: [embed],
+    allowedMentions: { parse: ["everyone"] }
+  });
 
   await pollMessage.react("✅"); // attending
   await pollMessage.react("❌"); // not attending
 }
 
+/* 🔻 SERVER SHUTDOWN */
+if (message.content === "!ssd") {
+  if (!message.member.roles.cache.has(STAFF_ROLE_ID))
+    return message.reply("❌ Staff only command.");
+
+  const embed = new EmbedBuilder()
+    .setTitle("🔻 Server Shutdown!")
+    .setDescription(
+      "**LCRPC** has shut down temporarily.\n\n" +
+      "----------------------------------------------------------------------------------------------\n\n" +
+      "**Server Information:**\n" +
+      "Game Code: **ILCRPC**\n" +
+      "Server Owner: **MiningMavenYT**"
+    )
+    .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
+    .setColor(0xE74C3C) // red shutdown color
+    .setFooter({ text: "Lake County Roleplay" })
+    .setTimestamp();
+
+  message.channel.send({ embeds: [embed] });
+}
 
   /* 🔢 COUNTING LOGIC */
   if (message.channel.id === countingChannelId) {
