@@ -354,6 +354,37 @@ if (message.content === "!ssd") {
   message.channel.send({ embeds: [embed] });
 }
 
+/* 🟢 SERVER STARTUP */
+if (message.content === "!ssu") {
+  if (!message.member.roles.cache.has(STAFF_ROLE_ID))
+    return message.reply("❌ Staff only command.");
+
+  const embed = new EmbedBuilder()
+    .setTitle("🟢 Server Startup!")
+    .setDescription(
+      "*A game session has begun. To join, just read the details provided below.*\n\n" +
+      "---------------------------------------------------------------------\n\n" +
+      "**Server Information:**\n" +
+      "Game Code: **ILCRPC**\n" +
+      "Server Owner: **MiningMavenYT**\n\n" +
+      "*Those who reacted must join*"
+    )
+    .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
+    .setColor(0x2ECC71) // green = startup
+    .setFooter({ text: "Lake County Roleplay" })
+    .setTimestamp();
+
+  const startupMessage = await message.channel.send({
+    content: `<@&1468213717035384882>`,
+    embeds: [embed],
+    allowedMentions: { roles: ["1468213717035384882"] }
+  });
+
+  // Optional reactions (people can react if they’re joining)
+  await startupMessage.react("✅");
+  await startupMessage.react("❌");
+}
+
   /* 🔢 COUNTING LOGIC */
   if (message.channel.id === countingChannelId) {
     const number = parseInt(message.content);
