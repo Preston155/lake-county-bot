@@ -85,15 +85,24 @@ client.on("guildMemberAdd", member => {
     .setTitle("👋 Welcome to Lake County Roleplay!")
     .setDescription(
       `Welcome ${member}!\n\n` +
-      "We’re excited to have you here 💙\n\n" +
-      "• Read the rules\n• Pick your roles\n• Enjoy realistic RP\n\n" +
-      "Need help? Open a ticket anytime!"
+      "We’re excited to have you here at **Lake County Roleplay** 💙\n\n" +
+      "**Get started:**\n" +
+      "📜 Read the server rules\n" +
+      "🎭 Set up your roles\n" +
+      "🚓 Enjoy realistic roleplay\n\n" +
+      "**Need help?** Open a support ticket anytime!"
     )
-    .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
     .setColor(0x2ECC71)
+    .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+    .setImage(
+      "https://media.discordapp.net/attachments/1442342822299566174/1466612239116013791/West_Virginia_Roleplay_5.png?width=1037&height=276"
+    )
     .setTimestamp();
 
-  channel.send({ embeds: [embed] });
+  channel.send({
+    content: `${member}`,
+    embeds: [embed]
+  });
 });
 
 /* ================= LEAVE ================= */
@@ -101,15 +110,16 @@ client.on("guildMemberRemove", member => {
   const channel = member.guild.channels.cache.get(LEAVE_CHANNEL_ID);
   if (!channel) return;
 
-  channel.send({
-    embeds: [
-      new EmbedBuilder()
-        .setTitle("💔 Member Left")
-        .setDescription(`${member.user.tag} has left the server.`)
-        .setColor(0xE74C3C)
-        .setTimestamp()
-    ]
-  });
+  const embed = new EmbedBuilder()
+    .setTitle("💔 Member Left")
+    .setDescription(
+      `${member.user.tag} has left the server.\n\n` +
+      "We hope to see you again someday 💙"
+    )
+    .setColor(0xE74C3C)
+    .setTimestamp();
+
+  channel.send({ embeds: [embed] });
 });
 
 /* ================= TICKET INTERACTIONS ================= */
