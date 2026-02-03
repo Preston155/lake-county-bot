@@ -83,7 +83,7 @@ client.on("guildMemberRemove", member => {
 client.on("messageCreate", async message => {
   if (message.author.bot || !message.guild) return;
 
-  /* 🎫 TICKET PANEL */
+  /* 🎫 SEND TICKET PANEL */
   if (message.content === "!ticketpanel") {
     if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator))
       return message.reply("❌ Admins only.");
@@ -114,12 +114,12 @@ client.on("messageCreate", async message => {
         .addOptions(
           {
             label: "👥 General Support",
-            description: "General questions, help, or concerns",
+            description: "General questions or concerns",
             value: "general"
           },
           {
             label: "🤝 Partnership Support",
-            description: "Partnership & collaboration requests",
+            description: "Partnership & collaboration",
             value: "partnership"
           },
           {
@@ -129,13 +129,13 @@ client.on("messageCreate", async message => {
           },
           {
             label: "🛠️ Management Support",
-            description: "Store purchases or high-rank issues",
+            description: "Store or high-rank issues",
             value: "management"
           }
         )
     );
 
-    return message.channel.send({ embeds: [embed], components: [menu] });
+    await message.channel.send({ embeds: [embed], components: [menu] });
   }
 });
 
