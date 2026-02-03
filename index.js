@@ -274,6 +274,36 @@ if (message.content === "!testboost") {
   });
 }
 
+/* 🤖 BOT INFO */
+if (message.content === "!botinfo") {
+  const uptime = Math.floor(process.uptime());
+  const days = Math.floor(uptime / 86400);
+  const hours = Math.floor((uptime % 86400) / 3600);
+  const minutes = Math.floor((uptime % 3600) / 60);
+
+  const embed = new EmbedBuilder()
+    .setTitle("🤖 Bot Information")
+    .setDescription(
+      "**Bot Name:** Lake County RP Bot\n" +
+      "**Developer:** MiningMavenYT\n\n" +
+
+      "**📊 Stats:**\n" +
+      `Servers: **${client.guilds.cache.size}**\n` +
+      `Users: **${client.users.cache.size}**\n` +
+      `Uptime: **${days}d ${hours}h ${minutes}m**\n\n` +
+
+      "**⚙️ Tech:**\n" +
+      "Library: **discord.js v14**\n" +
+      "Language: **Node.js**"
+    )
+    .setThumbnail(client.user.displayAvatarURL())
+    .setColor(0x5865F2)
+    .setFooter({ text: "Lake County Roleplay" })
+    .setTimestamp();
+
+  message.channel.send({ embeds: [embed] });
+}
+
   /* 🎉 GIVEAWAY */
 if (message.content.startsWith("!giveaway")) {
   if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild))
