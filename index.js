@@ -195,6 +195,52 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 client.on("messageCreate", async (message) => {
   if (message.author.bot || !message.guild) return;
 
+  client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isButton()) return;
+
+  const voters = sessionPolls.get(interaction.message.id);
+  if (!voters) return;
+
+  // ✅ VOTE BUTTON
+  if (interaction.customId === "sessionpoll_vote") {
+    if (voters.has(interaction.user.id)) {
+      return interaction.reply({
+        content: "❌ You have already voted.",
+        ephemeral: true
+      });
+    }
+
+    voters.add(interaction.user.id);
+
+    const count = voters.size;
+
+    const updatedRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("sessionpoll_vote")
+        .setLabel(`✅ Attend (${count}/5)`)
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(count >= 5),
+      new ButtonBuilder()
+        .setCustomId("sessionpoll_view")
+        .setLabel("👀 View Votes")
+        .setStyle(ButtonStyle.Secondary)
+    );
+
+    await interaction.update({ components: [updatedRow] });
+  }
+
+  // 👀 VIEW VOTES BUTTON
+  if (interaction.customId === "sessionpoll_view") {
+    const list =
+      [...voters].map(id => `<@${id}>`).join("\n") || "No votes yet.";
+
+    await interaction.reply({
+      content: `**Voters (${voters.size}/5):**\n${list}`,
+      ephemeral: true
+    });
+  }
+});
+
   /* 🚨 LOCKDOWN */
   if (message.content.startsWith("!lockdown")) {
     if (!message.member.roles.cache.has(LOCKDOWN_ROLE_ID))
