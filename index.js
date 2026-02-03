@@ -71,9 +71,17 @@ function saveData() {
 }
 
 /* ================= READY ================= */
-client.once("ready", () => {
-  loadData();
+client.once("ready", async () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
+
+  setImmediate(() => {
+    try {
+      loadData();
+      console.log("📦 Data loaded");
+    } catch (e) {
+      console.error("Data load failed:", e);
+    }
+  });
 });
 
 /* ================= WELCOME ================= */
