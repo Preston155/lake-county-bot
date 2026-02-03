@@ -102,6 +102,38 @@ client.once("ready", async () => {
   });
 });
 
+/* ================= TICKET CONFIG ================= */
+const TICKET_PANEL_CHANNEL_ID = "PUT_PANEL_CHANNEL_ID_HERE";
+const TICKET_LOG_CHANNEL_ID = "PUT_LOG_CHANNEL_ID_HERE";
+const STAFF_ROLE_ID = "1282417060391161978";
+
+const TICKET_CATEGORIES = {
+  general: {
+    label: "👥 General Support",
+    description: "General inquiries, concerns, reports",
+    categoryId: "1468276842942435338",
+    emoji: "👥"
+  },
+  partnership: {
+    label: "🤝 Partnership Support",
+    description: "Partnership & staff partnership requests",
+    categoryId: "1461009005798359204",
+    emoji: "🤝"
+  },
+  internal: {
+    label: "🛡️ Internal Affairs",
+    description: "Staff reports, appeals, role requests",
+    categoryId: "1468276930796327125",
+    emoji: "🛡️"
+  },
+  management: {
+    label: "🛠️ Management Support",
+    description: "Store purchases, high-rank inquiries",
+    categoryId: "1468277029865783489",
+    emoji: "🛠️"
+  }
+};
+
 /* ================= WELCOME ================= */
 client.on("guildMemberAdd", member => {
   const channel = member.guild.channels.cache.get(WELCOME_CHANNEL_ID);
@@ -148,173 +180,49 @@ client.on("guildMemberRemove", member => {
   channel.send({ embeds: [embed] });
 });
 
-/* ================= TICKET INTERACTIONS ================= */
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isButton()) return;
-
-  /* 🎫 CREATE TICKET */
-  if (interaction.customId === "create_ticket") {
-    const existing = interaction.guild.channels.cache.find(
-      c => c.topic === `ticket-user:${interaction.user.id}`
-    );
-    if (existing) {
-      return interaction.reply({
-        content: "⚠️ You already have an open ticket.",
-        ephemeral: true
-      });
-    }
-
-    const safeName = interaction.user.username
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "-");
-
-    const channel = await interaction.guild.channels.create({
-      name: `ticket-${safeName}`,
-      type: ChannelType.GuildText,
-      parent: TICKET_CATEGORY_ID,
-      topic: `ticket-user:${interaction.user.id}`,
-      permissionOverwrites: [
-        {
-          id: interaction.guild.id,
-          deny: [PermissionsBitField.Flags.ViewChannel]
-        },
-        {
-          id: interaction.user.id,
-          allow: [
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.SendMessages
-          ]
-        },
-        {
-          id: STAFF_ROLE_ID,
-          allow: [
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.SendMessages
-          ]
-        }
-      ]
-    });
-
-    const embed = new EmbedBuilder()
-      .setTitle("🎫 Ticket Opened")
-      .setDescription(
-        "Thanks for opening a ticket!\n\n" +
-        "Please explain your issue in detail.\n" +
-        "A staff member will assist you shortly.\n\n" +
-        "**Rules:**\n" +
-        "• Do not ping staff\n" +
-        "• Stay on topic"
-      )
-      .setColor(0x2ECC71);
-
-    const buttons = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId("claim_ticket")
-        .setLabel("🧑‍💼 Claim")
-        .setStyle(ButtonStyle.Success),
-      new ButtonBuilder()
-        .setCustomId("unclaim_ticket")
-        .setLabel("↩ Unclaim")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("close_ticket")
-        .setLabel("🔒 Close")
-        .setStyle(ButtonStyle.Danger)
-    );
-
-    channel.send({
-      content: `<@&${STAFF_ROLE_ID}> ${interaction.user}`,
-      embeds: [embed],
-      components: [buttons]
-    });
-
-    interaction.guild.channels.cache
-      .get(TICKET_LOG_CHANNEL_ID)
-      ?.send({
-        embeds: [
-          new EmbedBuilder()
-            .setTitle("🎫 Ticket Opened")
-            .setDescription(`${interaction.user.tag} → ${channel}`)
-            .setColor(0x2ECC71)
-            .setTimestamp()
-        ]
-      });
-
-    return interaction.reply({
-      content: `✅ Ticket created: ${channel}`,
-      ephemeral: true
-    });
-  }
-
-  /* 🧑‍💼 CLAIM */
-  if (interaction.customId === "claim_ticket") {
-    if (!interaction.member.roles.cache.has(STAFF_ROLE_ID))
-      return interaction.reply({ content: "❌ Staff only.", ephemeral: true });
-
-    interaction.channel.send(`🧑‍💼 Ticket claimed by ${interaction.user}`);
-    return interaction.reply({ content: "✅ Claimed.", ephemeral: true });
-  }
-
-  /* ↩ UNCLAIM */
-  if (interaction.customId === "unclaim_ticket") {
-    if (!interaction.member.roles.cache.has(STAFF_ROLE_ID))
-      return interaction.reply({ content: "❌ Staff only.", ephemeral: true });
-
-    interaction.channel.send(`↩ Ticket unclaimed by ${interaction.user}`);
-    return interaction.reply({ content: "↩ Unclaimed.", ephemeral: true });
-  }
-
-  /* 🔒 CLOSE */
-  if (interaction.customId === "close_ticket") {
-    await interaction.reply("🔒 Closing ticket in 3 seconds...");
-    setTimeout(() => interaction.channel.delete().catch(() => {}), 3000);
-  }
-});
-
 /* ================= MESSAGE HANDLER ================= */
 client.on("messageCreate", async message => {
   if (message.author.bot || !message.guild) return;
 
-  /* 🎫 SEND TICKET PANEL */
-if (cmd === "!sendpanel") {
-  if (!message.member.roles.cache.has(STAFF_ROLE_ID))
-    return message.reply("❌ Staff only.");
+  if (message.content === "!ticketpanel") {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator))
+    return message.reply("❌ Admins only.");
 
-  // Optional: lock panel to one channel
-  // if (message.channel.id !== TICKET_PANEL_CHANNEL_ID)
-  //   return message.reply("❌ This command can only be used in the ticket panel channel.");
+  if (message.channel.id !== TICKET_PANEL_CHANNEL_ID)
+    return message.reply("❌ Use this command in the ticket panel channel.");
 
   const embed = new EmbedBuilder()
-    .setTitle("🎫 Support Tickets")
+    .setTitle("🎫 LAKE COUNTY ROLEPLAY — ASSISTANCE")
     .setDescription(
-      "> Need help? You’re in the right place.\n\n" +
-      "If you have a question, need assistance, or want to report an issue,\n" +
-      "please open a ticket using the button below.\n\n" +
-      "**Before opening a ticket:**\n" +
-      "• Be clear and detailed about your issue\n" +
-      "• One issue per ticket\n" +
-      "• Remain respectful and patient\n\n" +
-      "🔔 **Important:** Do not ping staff.\n" +
-      "Tickets are handled in the order they are received.\n\n" +
-      "Thank you for reaching out — we’re here to help! 💙"
+      "**Welcome to the Assistance Dashboard**\n\n" +
+      "Select the type of support you need below.\n" +
+      "False tickets may result in punishment.\n\n" +
+      "**Support Options:**\n" +
+      "• 👥 General Support\n" +
+      "• 🤝 Partnership Support\n" +
+      "• 🛡️ Internal Affairs\n" +
+      "• 🛠️ Management Support\n\n" +
+      "_Please do not ping staff._"
     )
     .setColor(0x00BFFF)
-    .setFooter({ text: "Lake County Roleplay Support" })
-    .setTimestamp();
+    .setImage("https://media.discordapp.net/attachments/1442342822299566174/1466612239116013791/West_Virginia_Roleplay_5.png")
+    .setFooter({ text: "Lake County Roleplay Support" });
 
-  const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId("create_ticket")
-      .setLabel("🎫 Open Ticket")
-      .setStyle(ButtonStyle.Primary)
+  const menu = new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId("ticket_select")
+      .setPlaceholder("Request Assistance...")
+      .addOptions(
+        Object.entries(TICKET_CATEGORIES).map(([id, c]) => ({
+          label: c.label,
+          description: c.description,
+          value: id,
+          emoji: c.emoji
+        }))
+      )
   );
 
-  await message.channel.send({
-    embeds: [embed],
-    components: [row]
-  });
-
-  return message.reply({ content: "✅ Ticket panel sent.", ephemeral: true });
+  return message.channel.send({ embeds: [embed], components: [menu] });
 }
 
   /* ⚠️ WARN USER */
@@ -516,10 +424,6 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
     });
   }
 });
-
-const STAFF_ROLE_ID = "1282417060391161978";
-const TICKET_CATEGORY_ID = "1461009005798359204";
-const TICKET_LOG_CHANNEL_ID = "1461010272444747867";
 
 /* 🚨 SERVER LOCKDOWN */
 if (message.content.startsWith("!lockdown")) {
@@ -795,6 +699,81 @@ if (message.content === "!ssu") {
     await message.delete();
     await message.channel.bulkDelete(amt, true);
   }
+});
+
+client.on("interactionCreate", async interaction => {
+  if (!interaction.isStringSelectMenu()) return;
+  if (interaction.customId !== "ticket_select") return;
+
+  const type = interaction.values[0];
+  const config = TICKET_CATEGORIES[type];
+  if (!config) return;
+
+  const existing = interaction.guild.channels.cache.find(
+    c => c.topic === `ticket:${interaction.user.id}`
+  );
+  if (existing)
+    return interaction.reply({
+      content: "⚠️ You already have an open ticket.",
+      ephemeral: true
+    });
+
+  const channel = await interaction.guild.channels.create({
+    name: `ticket-${interaction.user.username}`.toLowerCase(),
+    type: ChannelType.GuildText,
+    parent: config.categoryId,
+    topic: `ticket:${interaction.user.id}`,
+    permissionOverwrites: [
+      { id: interaction.guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
+      { id: interaction.user.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages] },
+      { id: STAFF_ROLE_ID, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages] }
+    ]
+  });
+
+  const embed = new EmbedBuilder()
+    .setTitle(`${config.emoji} ${config.label}`)
+    .setDescription(
+      `Hello ${interaction.user},\n\n` +
+      "Please explain your issue clearly.\n" +
+      "A staff member will assist you shortly.\n\n" +
+      "**Rules:**\n• One issue per ticket\n• No staff pings"
+    )
+    .setColor(0x2ECC71);
+
+  const buttons = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("ticket_close")
+      .setLabel("🔒 Close Ticket")
+      .setStyle(ButtonStyle.Danger)
+  );
+
+  await channel.send({
+    content: `<@&${STAFF_ROLE_ID}> ${interaction.user}`,
+    embeds: [embed],
+    components: [buttons]
+  });
+
+  interaction.guild.channels.cache.get(TICKET_LOG_CHANNEL_ID)?.send({
+    embeds: [
+      new EmbedBuilder()
+        .setTitle("🎫 Ticket Created")
+        .setDescription(`${interaction.user} → ${channel}`)
+        .setColor(0x00BFFF)
+        .setTimestamp()
+    ]
+  });
+
+  interaction.reply({
+    content: `✅ Ticket created: ${channel}`,
+    ephemeral: true
+  });
+
+  client.on("interactionCreate", async interaction => {
+  if (!interaction.isButton()) return;
+  if (interaction.customId !== "ticket_close") return;
+
+  await interaction.reply("🔒 Closing ticket in 3 seconds...");
+  setTimeout(() => interaction.channel.delete().catch(() => {}), 3000);
 });
 
 /* ================= BUTTON HANDLER ================= */
