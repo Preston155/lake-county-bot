@@ -42,6 +42,7 @@ const ANNOUNCEMENT_ROLE_ID = "1310976402430103562";
 const BOOST_CHANNEL_ID = "1467596304900292869";
 const sessionPolls = new Map(); 
 // messageId => { voters: Set<userId> }
+const sessionPolls = new Map(); // messageId => Set(userIds)
 
 
 
@@ -49,6 +50,8 @@ const sessionPolls = new Map();
 let countingChannelId = null;
 let currentCount = 0;
 let lastCounterId = null;
+let lastSessionPollMessageId = null;
+
 
 /* ================= WARNINGS ================= */
 const warnings = {};
@@ -194,6 +197,52 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 /* ================= MESSAGE HANDLER ================= */
 client.on("messageCreate", async (message) => {
   if (message.author.bot || !message.guild) return;
+
+  client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isButton()) return;
+
+  const voters = sessionPolls.get(interaction.message.id);
+  if (!voters) return;
+
+  // Vote button
+  if (interaction.customId === "sessionpoll_vote") {
+    if (voters.has(interaction.user.id)) {
+      return interaction.reply({
+        content: "❌ You have already voted.",
+        ephemeral: true
+      });
+    }
+
+    voters.add(interaction.user.id);
+
+    const count = voters.size;
+
+    const updatedRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("sessionpoll_vote")
+        .setLabel(`✅ Attend (${count}/5)`)
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(count >= 5),
+      new ButtonBuilder()
+        .setCustomId("sessionpoll_view")
+        .setLabel("👀 View Votes")
+        .setStyle(ButtonStyle.Secondary)
+    );
+
+    await interaction.update({ components: [updatedRow] });
+  }
+
+  // View votes button
+  if (interaction.customId === "sessionpoll_view") {
+    const list =
+      [...voters].map(id => `<@${id}>`).join("\n") || "No votes yet.";!
+
+    await interaction.reply({
+      content: `**Voters (${voters.size}/5):**\n${list}`,
+      ephemeral: true
+    });
+  }
+});
 
   client.on("interactionCreate", async (interaction) => {
   if (!interaction.isButton()) return;
@@ -443,7 +492,9 @@ if (message.content === "!sessionpoll") {
     allowedMentions: { parse: ["everyone"] }
   });
 
-  sessionPolls.set(pollMessage.id, new Set());
+sessionPolls.set(pollMessage.id, new Set());
+lastSessionPollMessageId = pollMessage.id;
+
 }
 
 
@@ -469,17 +520,28 @@ if (message.content === "!ssd") {
   message.channel.send({ embeds: [embed] });
 }
 
-
-/* 🟢 SERVER STARTUP */
+/* 🚨 SERVER STARTUP */
 if (message.content === "!ssu") {
   if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
     return message.reply("❌ You are not authorized to use this command.");
 
+  if (!lastSessionPollMessageId || !sessionPolls.has(lastSessionPollMessageId)) {
+    return message.reply("❌ No active session poll found.");
+  }
+
+  const voters = sessionPolls.get(lastSessionPollMessageId);
+
+  if (!voters.size) {
+    return message.reply("❌ No one voted in the session poll.");
+  }
+
+  const mentions = [...voters].map(id => `<@${id}>`).join(" ");
+
   const embed = new EmbedBuilder()
-    .setTitle("🟢 Server Startup!")
+    .setTitle("🚨 Server Startup!")
     .setDescription(
+      "**Server Startup!**\n" +
       "*A game session has begun. To join, just read the details provided below.*\n\n" +
-      "---------------------------------------------------------------------\n\n" +
       "**Server Information:**\n" +
       "Game Code: **ILCRPC**\n" +
       "Server Owner: **MiningMavenYT**\n\n" +
@@ -490,10 +552,10 @@ if (message.content === "!ssu") {
     .setFooter({ text: "Lake County Roleplay" })
     .setTimestamp();
 
-  message.channel.send({
-    content: `<@&1468213717035384882>`,
+  await message.channel.send({
+    content: mentions,
     embeds: [embed],
-    allowedMentions: { roles: ["1468213717035384882"] }
+    allowedMentions: { users: [...voters] }
   });
 }
 
