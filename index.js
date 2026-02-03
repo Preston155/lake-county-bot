@@ -40,7 +40,8 @@ const WELCOME_CHANNEL_ID = "1460994169697730560";
 const LEAVE_CHANNEL_ID = "1460994659848421377";
 const BOOST_CHANNEL_ID = "1467596304900292869";
 const SSU_PING_ROLE_ID = "1310976402430103562";
-
+const { EmbedBuilder } = require("discord.js");
+const fetch = require("node-fetch");
 
 /* ================= STORAGE ================= */
 const DATA_FILE = path.join(__dirname, "data.json");
@@ -75,6 +76,23 @@ client.once("ready", () => {
   loadData();
   console.log(`✅ Logged in as ${client.user.tag}`);
 });
+
+async function fetchERLCStatus() {
+  const res = await fetch(
+    "https://api.policeroleplay.community/v1/server",
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.ERLC_API_KEY}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("ERLC API request failed");
+  }
+
+  return res.json();
+}
 
 /* ================= WELCOME ================= */
 client.on("guildMemberAdd", member => {
@@ -269,6 +287,49 @@ if (message.content.startsWith("!warn")) {
     `📊 Total warnings: **${warnings[user.id].length}**`
   );
 }
+
+  if (!message.content.startsWith("!")) return;
+
+  const args = message.content.slice(1).trim().split(/ +/);
+  const command = args.shift().toLowerCase();
+
+  if (command === "erlcstatus") {
+    try {
+      const data = await fetchERLCStatus();
+
+      const embed = new EmbedBuilder()
+        .setTitle("🚓 ERLC Server Status")
+        .setColor(data.online ? 0x2ecc71 : 0xe74c3c)
+        .addFields(
+          {
+            name: "Status",
+            value: data.online ? "🟢 Online" : "🔴 Offline",
+            inline: true,
+          },
+          {
+            name: "Players",
+            value: `${data.players}/${data.maxPlayers}`,
+            inline: true,
+          },
+          {
+            name: "Server Name",
+            value: data.name || "Unknown",
+            inline: false,
+          }
+        )
+        .setFooter({ text: "Emergency Response: Liberty County" })
+        .setTimestamp();
+
+      await message.reply({ embeds: [embed] });
+
+    } catch (error) {
+      console.error(error);
+      await message.reply(
+        "⚠️ Unable to fetch ERLC server status right now."
+      );
+    }
+  }
+});
 
 /* 📋 VIEW WARNINGS */
 if (message.content.startsWith("!warnings")) {
