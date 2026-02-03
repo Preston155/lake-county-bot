@@ -189,8 +189,8 @@ client.on("messageCreate", async message => {
   if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator))
     return message.reply("❌ Admins only.");
 
-  if (message.channel.id !== TICKET_PANEL_CHANNEL_ID)
-    return message.reply("❌ Use this command in the ticket panel channel.");
+ // if (message.channel.id !== TICKET_PANEL_CHANNEL_ID)
+   // return message.reply("❌ Use this command in the ticket panel channel.");
 
   const embed = new EmbedBuilder()
     .setTitle("🎫 LAKE COUNTY ROLEPLAY — ASSISTANCE")
