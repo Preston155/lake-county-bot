@@ -417,7 +417,7 @@ if (message.content === "!sessionpoll") {
     .setDescription(
       "**Session Poll!**\n\n" +
       "A session poll has been initiated, please react below whether you'll be able to attend this session or not.\n\n" +
-      "**🟢 6+ ticks needed for the session to start**"
+      "**🟢 5+ ticks needed for the session to start**"
     )
     .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
     .setColor(0x00BFFF)
