@@ -406,7 +406,6 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
       embeds: [embed]
     });
   }
-});
 
 /* 🚨 SERVER LOCKDOWN */
 if (message.content.startsWith("!lockdown")) {
