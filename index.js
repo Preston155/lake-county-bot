@@ -196,6 +196,29 @@ client.on("messageCreate", async (message) => {
     await Promise.all(promises);
   }
 
+  client.on("messageCreate", async (message) => {
+  if (message.author.bot) return;
+
+  // 🔹 SESSION POLL COMMAND
+  if (message.content === "!sessionpoll") {
+    const embed = new EmbedBuilder()
+      .setTitle("📊 Session Poll")
+      .setDescription(
+        "**Session Poll!**\n\n" +
+        "A session poll has been initiated. Please react below whether you'll be able to attend this session or not.\n\n" +
+        "**🟢 6+ ticks needed for the session to start**"
+      )
+      .setColor(0x00bfff)
+      .setFooter({ text: "Lake County Roleplay" })
+      .setTimestamp();
+
+    const pollMessage = await message.channel.send({ embeds: [embed] });
+
+    await pollMessage.react("✅");
+    await pollMessage.react("❌");
+  }
+});
+
   /* 🔓 UNLOCKDOWN */
   if (message.content === "!unlockdown") {
     if (!message.member.roles.cache.has(LOCKDOWN_ROLE_ID))
