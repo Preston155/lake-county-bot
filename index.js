@@ -285,7 +285,7 @@ if (message.content === "!botinfo") {
     .setTitle("🤖 Bot Information")
     .setDescription(
       "**Bot Name:** Lake County RP Bot\n" +
-      "**Developer:** MiningMavenYT\n\n" +
+      "**Developer:** Preston\n\n" +
 
       "**📊 Stats:**\n" +
       `Servers: **${client.guilds.cache.size}**\n` +
