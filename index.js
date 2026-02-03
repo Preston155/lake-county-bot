@@ -8,6 +8,7 @@ const {
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
+  StringSelectMenuBuilder,
   Partials
 } = require("discord.js");
 const fs = require("fs");
