@@ -14,16 +14,16 @@ const fs = require("fs");
 const path = require("path");
 
 /* ================= CLIENT ================= */
+/* ================= CLIENT ================= */
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMessageReactions
+    GatewayIntentBits.MessageContent
   ],
-  partials: [Partials.Message, Partials.Channel, Partials.Reaction]
+  partials: [Partials.Message, Partials.Channel]
 });
+
 
 /* ================= CONFIG ================= */
 const STAFF_ROLE_ID = "1282417060391161978";
