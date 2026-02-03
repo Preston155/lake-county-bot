@@ -305,27 +305,29 @@ if (message.content.startsWith("!giveaway")) {
     message.channel.send("🔢 **This channel is now the counting channel!** Start with **1**.");
   }
 
-    /* 📊 SESSION POLL */
-  if (message.content === "!ssupoll") {
-    if (!message.member.roles.cache.has(STAFF_ROLE_ID))
-      return message.reply("❌ Staff only command.");
+/* 📊 SESSION POLL */
+if (message.content === "!ssupoll") {
+  if (!message.member.roles.cache.has(STAFF_ROLE_ID))
+    return message.reply("❌ Staff only command.");
 
-    const embed = new EmbedBuilder()
-      .setTitle("📊 Session Poll")
-      .setDescription(
-        "**Session Poll!**\n\n" +
-        "A session poll has been initiated, please react below whether you'll be able to attend this session or not.\n\n" +
-        "**🟢 6+ ticks needed for the session to start**"
-      )
-      .setColor(0x00BFFF)
-      .setFooter({ text: "Lake County Roleplay" })
-      .setTimestamp();
+  const embed = new EmbedBuilder()
+    .setTitle("📊 Session Poll")
+    .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
+    .setDescription(
+      "**Session Poll!**\n\n" +
+      "A session poll has been initiated, please react below whether you'll be able to attend this session or not.\n\n" +
+      "**🟢 6+ ticks needed for the session to start**"
+    )
+    .setColor(0x00BFFF)
+    .setFooter({ text: "Lake County Roleplay" })
+    .setTimestamp();
 
-    const pollMessage = await message.channel.send({ embeds: [embed] });
+  const pollMessage = await message.channel.send({ embeds: [embed] });
 
-    await pollMessage.react("✅"); // attending
-    await pollMessage.react("❌"); // not attending
-  }
+  await pollMessage.react("✅"); // attending
+  await pollMessage.react("❌"); // not attending
+}
+
 
   /* 🔢 COUNTING LOGIC */
   if (message.channel.id === countingChannelId) {
