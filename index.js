@@ -221,7 +221,7 @@ if (message.content === "!applications") {
     new ButtonBuilder()
       .setLabel("📎 Apply Here")
       .setStyle(ButtonStyle.Link)
-      .setURL("https://YOUR_APPLICATION_LINK_HERE")
+      .setURL("https://circlebot.xyz/guilds/1271522367641751593/customcommands")
   );
 
   await message.channel.send({
