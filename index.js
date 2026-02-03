@@ -277,8 +277,8 @@ if (message.content === "!testboost") {
 /* 📝 APPLICATIONS PANEL */
 if (message.content === "!applications") {
   // Role check
-  if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
-    return message.reply("❌ You are not authorized to use this command.");
+  // if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
+    // return message.reply("❌ You are not authorized to use this command.");
 
   const embed = new EmbedBuilder()
     .setTitle("📋 Lake County Roleplay Applications")
