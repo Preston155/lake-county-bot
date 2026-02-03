@@ -276,16 +276,19 @@ if (message.content === "!testboost") {
 
 /* 🤖 BOT INFO */
 if (message.content === "!botinfo") {
-  const uptime = Math.floor(process.uptime());
-  const days = Math.floor(uptime / 86400);
-  const hours = Math.floor((uptime % 86400) / 3600);
-  const minutes = Math.floor((uptime % 3600) / 60);
+  const now = Date.now();
+  const readyAt = client.readyAt?.getTime() ?? now;
+  const diff = now - readyAt;
+
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
 
   const embed = new EmbedBuilder()
     .setTitle("🤖 Bot Information")
     .setDescription(
       "**Bot Name:** Lake County RP Bot\n" +
-      "**Developer:** Preston\n\n" +
+      `**Developer:** ${message.author.tag}\n\n` +
 
       "**📊 Stats:**\n" +
       `Servers: **${client.guilds.cache.size}**\n` +
@@ -303,6 +306,7 @@ if (message.content === "!botinfo") {
 
   message.channel.send({ embeds: [embed] });
 }
+
 
   /* 🎉 GIVEAWAY */
 if (message.content.startsWith("!giveaway")) {
