@@ -460,7 +460,7 @@ if (message.content === "!sessionpoll") {
   if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
     return message.reply("❌ You are not authorized to use this command.");
 
-  // Clear previous session poll data
+  // Clear previous poll data
   if (lastSessionPollMessageId) {
     sessionPolls.delete(lastSessionPollMessageId);
   }
@@ -477,17 +477,16 @@ if (message.content === "!sessionpoll") {
     .setFooter({ text: "Lake County Roleplay" })
     .setTimestamp();
 
-  const voteButton = new ButtonBuilder()
-    .setCustomId("sessionpoll_vote")
-    .setLabel("✅ Attend (0/5)")
-    .setStyle(ButtonStyle.Success);
-
-  const viewButton = new ButtonBuilder()
-    .setCustomId("sessionpoll_view")
-    .setLabel("👀 View Votes")
-    .setStyle(ButtonStyle.Secondary);
-
-  const row = new ActionRowBuilder().addComponents(voteButton, viewButton);
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("sessionpoll_vote")
+      .setLabel("✅ Attend (0/5)")
+      .setStyle(ButtonStyle.Success),
+    new ButtonBuilder()
+      .setCustomId("sessionpoll_view")
+      .setLabel("👀 View Votes")
+      .setStyle(ButtonStyle.Secondary)
+  );
 
   const pollMessage = await message.channel.send({
     content: "@everyone",
@@ -496,10 +495,11 @@ if (message.content === "!sessionpoll") {
     allowedMentions: { parse: ["everyone"] }
   });
 
-  // Create a fresh voter set for this poll
+  // Always create a fresh voter set
   sessionPolls.set(pollMessage.id, new Set());
   lastSessionPollMessageId = pollMessage.id;
 }
+
 
 
 
@@ -841,6 +841,57 @@ client.on("interactionCreate", async (interaction) => {
     setTimeout(() => interaction.channel.delete(), 3000);
   }
 });
+
+/* 📊 SESSION POLL BUTTONS */
+if (
+  interaction.customId === "sessionpoll_vote" ||
+  interaction.customId === "sessionpoll_view"
+) {
+  // Always guarantee a fresh voter set
+  let voters = sessionPolls.get(interaction.message.id);
+  if (!voters) {
+    voters = new Set();
+    sessionPolls.set(interaction.message.id, voters);
+  }
+
+  // ✅ VOTE
+  if (interaction.customId === "sessionpoll_vote") {
+    if (voters.has(interaction.user.id)) {
+      return interaction.reply({
+        content: "❌ You have already voted.",
+        ephemeral: true
+      });
+    }
+
+    voters.add(interaction.user.id);
+    const count = voters.size;
+
+    const updatedRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("sessionpoll_vote")
+        .setLabel(`✅ Attend (${count}/5)`)
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(count >= 5),
+      new ButtonBuilder()
+        .setCustomId("sessionpoll_view")
+        .setLabel("👀 View Votes")
+        .setStyle(ButtonStyle.Secondary)
+    );
+
+    return interaction.update({ components: [updatedRow] });
+  }
+
+  // 👀 VIEW VOTES
+  if (interaction.customId === "sessionpoll_view") {
+    const list =
+      [...voters].map(id => `<@${id}>`).join("\n") || "No votes yet.";
+
+    return interaction.reply({
+      content: `**Voters (${voters.size}/5):**\n${list}`,
+      ephemeral: true
+    });
+  }
+}
 
 /* ================= SAFE SHUTDOWN ================= */
 process.on("SIGINT", () => { saveData(); process.exit(); });
