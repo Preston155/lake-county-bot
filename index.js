@@ -275,6 +275,48 @@ client.on("interactionCreate", async (interaction) => {
 client.on("messageCreate", async message => {
   if (message.author.bot || !message.guild) return;
 
+  /* 🎫 SEND TICKET PANEL */
+if (cmd === "!sendpanel") {
+  if (!message.member.roles.cache.has(STAFF_ROLE_ID))
+    return message.reply("❌ Staff only.");
+
+  // Optional: lock panel to one channel
+  // if (message.channel.id !== TICKET_PANEL_CHANNEL_ID)
+  //   return message.reply("❌ This command can only be used in the ticket panel channel.");
+
+  const embed = new EmbedBuilder()
+    .setTitle("🎫 Support Tickets")
+    .setDescription(
+      "> Need help? You’re in the right place.\n\n" +
+      "If you have a question, need assistance, or want to report an issue,\n" +
+      "please open a ticket using the button below.\n\n" +
+      "**Before opening a ticket:**\n" +
+      "• Be clear and detailed about your issue\n" +
+      "• One issue per ticket\n" +
+      "• Remain respectful and patient\n\n" +
+      "🔔 **Important:** Do not ping staff.\n" +
+      "Tickets are handled in the order they are received.\n\n" +
+      "Thank you for reaching out — we’re here to help! 💙"
+    )
+    .setColor(0x00BFFF)
+    .setFooter({ text: "Lake County Roleplay Support" })
+    .setTimestamp();
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("create_ticket")
+      .setLabel("🎫 Open Ticket")
+      .setStyle(ButtonStyle.Primary)
+  );
+
+  await message.channel.send({
+    embeds: [embed],
+    components: [row]
+  });
+
+  return message.reply({ content: "✅ Ticket panel sent.", ephemeral: true });
+}
+
   /* ⚠️ WARN USER */
 if (message.content.startsWith("!warn")) {
   if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
