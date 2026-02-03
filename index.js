@@ -196,9 +196,6 @@ client.on("messageCreate", async (message) => {
     await Promise.all(promises);
   }
 
-  client.on("messageCreate", async (message) => {
-  if (message.author.bot) return;
-
   /* 🔓 UNLOCKDOWN */
   if (message.content === "!unlockdown") {
     if (!message.member.roles.cache.has(LOCKDOWN_ROLE_ID))
@@ -306,6 +303,28 @@ if (message.content.startsWith("!giveaway")) {
     saveData();
 
     message.channel.send("🔢 **This channel is now the counting channel!** Start with **1**.");
+  }
+
+    /* 📊 SESSION POLL */
+  if (message.content === "!ssupoll") {
+    if (!message.member.roles.cache.has(STAFF_ROLE_ID))
+      return message.reply("❌ Staff only command.");
+
+    const embed = new EmbedBuilder()
+      .setTitle("📊 Session Poll")
+      .setDescription(
+        "**Session Poll!**\n\n" +
+        "A session poll has been initiated, please react below whether you'll be able to attend this session or not.\n\n" +
+        "**🟢 6+ ticks needed for the session to start**"
+      )
+      .setColor(0x00BFFF)
+      .setFooter({ text: "Lake County Roleplay" })
+      .setTimestamp();
+
+    const pollMessage = await message.channel.send({ embeds: [embed] });
+
+    await pollMessage.react("✅"); // attending
+    await pollMessage.react("❌"); // not attending
   }
 
   /* 🔢 COUNTING LOGIC */
