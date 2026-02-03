@@ -42,7 +42,6 @@ const ANNOUNCEMENT_ROLE_ID = "1310976402430103562";
 const BOOST_CHANNEL_ID = "1467596304900292869";
 const sessionPolls = new Map(); 
 // messageId => { voters: Set<userId> }
-const sessionPolls = new Map(); // messageId => Set(userIds)
 
 
 
