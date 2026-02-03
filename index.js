@@ -1,3 +1,4 @@
+console.log("RUNNING THIS FILE:", __filename);
 require("dotenv").config();
 const {
   Client,
