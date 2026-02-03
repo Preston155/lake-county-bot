@@ -17,12 +17,16 @@ const path = require("path");
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMembers,           // ✅ REQUIRED for welcome/leave
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMessageReactions
+    GatewayIntentBits.MessageContent,         // ✅ Required for prefix commands
+    GatewayIntentBits.GuildMessageReactions   // ✅ Optional (remove if unused)
   ],
-  partials: [Partials.Message, Partials.Channel, Partials.Reaction]
+  partials: [
+    Partials.Message,
+    Partials.Channel,
+    Partials.Reaction
+  ]
 });
 
 /* ================= CONFIG ================= */
