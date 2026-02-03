@@ -407,10 +407,6 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
   }
 });
 
-const STAFF_ROLE_ID = "1282417060391161978";
-const TICKET_CATEGORY_ID = "1461009005798359204";
-const TICKET_LOG_CHANNEL_ID = "1461010272444747867";
-
 /* 🚨 SERVER LOCKDOWN */
 if (message.content.startsWith("!lockdown")) {
   if (!message.member.roles.cache.has(LOCKDOWN_ROLE_ID))
