@@ -383,6 +383,33 @@ if (message.content === "!ssu") {
   });
 }
 
+/* ℹ️ SESSION INFORMATION */
+if (message.content === "!sessioninfo") {
+  if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
+    return message.reply("❌ You are not authorized to use this command.");
+
+  const embed = new EmbedBuilder()
+    .setTitle("ℹ️ Session Information")
+    .setDescription(
+      "Sessions are hosted whenever game moderators are available for a duty. " +
+      "You can find a schedule below with an estimated uptime for SSU sessions.\n\n" +
+
+      "**Session times:**\n" +
+      "*Weekdays Uptime (CST)  |  Weekends Uptime (CST)*\n" +
+      "***1:00 PM → 11:00 PM   |   9:00 AM → 12:00 AM***\n\n" +
+
+      "**Session Information:**\n" +
+      "Game Code: **ILCRPC**\n" +
+      "Server Owner: **MiningMavenYT**"
+    )
+    .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
+    .setColor(0x3498DB) // info blue
+    .setFooter({ text: "Lake County Roleplay" })
+    .setTimestamp();
+
+  message.channel.send({ embeds: [embed] });
+}
+
   /* 🔢 COUNTING LOGIC */
   if (message.channel.id === countingChannelId) {
     const number = parseInt(message.content);
