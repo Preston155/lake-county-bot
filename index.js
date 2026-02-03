@@ -40,6 +40,9 @@ const WELCOME_CHANNEL_ID = "1460994169697730560";
 const LEAVE_CHANNEL_ID = "1460994659848421377";
 const ANNOUNCEMENT_ROLE_ID = "1310976402430103562";
 const BOOST_CHANNEL_ID = "1467596304900292869";
+const sessionPolls = new Map(); 
+// messageId => { voters: Set<userId> }
+
 
 
 /* ================= COUNTING ================= */
@@ -191,45 +194,6 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 /* ================= MESSAGE HANDLER ================= */
 client.on("messageCreate", async (message) => {
   if (message.author.bot || !message.guild) return;
-
-/* 📝 APPLICATIONS PANEL */
-if (message.content === "!applications") {
-
-  const embed = new EmbedBuilder()
-    .setTitle("📋 Lake County Roleplay Applications")
-    .setDescription(
-      "When creating an application, we require a few important key details. " +
-      "You can find all required information listed below, as well as on our application.\n\n" +
-
-      "**Requirements:**\n" +
-      "• You must be **13 years of age or older**.\n" +
-      "• Have a **basic understanding of ER:LC commands and features**.\n" +
-      "• A **basic understanding of spelling, punctuation, and grammar**.\n" +
-      "• Have the ability to **complete a minimum of 4 hours per week**.\n" +
-      "• No **major negative history** with **Lake County Roleplay**.\n" +
-      "• Ability to **write your own application without assistance from AI**.\n\n" +
-
-      "⚠️ **Important Notice:**\n" +
-      "Do **not** ask for your application to be reviewed. Doing so will result in **automatic denial**."
-    )
-    .setImage("https://media.discordapp.net/attachments/1452829338545160285/1466919030127591613/ILLEGAL_FIREARM_1.png")
-    .setColor(0x00BFFF)
-    .setFooter({ text: "Lake County Roleplay • Applications" })
-    .setTimestamp();
-
-  const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setLabel("📎 Apply Here")
-      .setStyle(ButtonStyle.Link)
-      .setURL("https://circlebot.xyz/guilds/1271522367641751593/customcommands")
-  );
-
-  await message.channel.send({
-    embeds: [embed],
-    components: [row]
-  });
-}
-
 
   /* 🚨 LOCKDOWN */
   if (message.content.startsWith("!lockdown")) {
@@ -414,15 +378,28 @@ if (message.content === "!sessionpoll") {
     .setFooter({ text: "Lake County Roleplay" })
     .setTimestamp();
 
+  const voteButton = new ButtonBuilder()
+    .setCustomId("sessionpoll_vote")
+    .setLabel("✅ Attend (0/5)")
+    .setStyle(ButtonStyle.Success);
+
+  const viewButton = new ButtonBuilder()
+    .setCustomId("sessionpoll_view")
+    .setLabel("👀 View Votes")
+    .setStyle(ButtonStyle.Secondary);
+
+  const row = new ActionRowBuilder().addComponents(voteButton, viewButton);
+
   const pollMessage = await message.channel.send({
-    content: "@everyone",
+    content: "@here",
     embeds: [embed],
+    components: [row],
     allowedMentions: { parse: ["everyone"] }
   });
 
-  await pollMessage.react("✅");
-  await pollMessage.react("❌");
+  sessionPolls.set(pollMessage.id, new Set());
 }
+
 
 /* 🔻 SERVER SHUTDOWN */
 if (message.content === "!ssd") {
