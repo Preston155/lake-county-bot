@@ -39,6 +39,8 @@ const LOCKDOWN_LOG_CHANNEL_ID = "1461008751749234740";
 const WELCOME_CHANNEL_ID = "1460994169697730560";
 const LEAVE_CHANNEL_ID = "1460994659848421377";
 const ANNOUNCEMENT_ROLE_ID = "1310976402430103562";
+const BOOST_CHANNEL_ID = "1467596304900292869";
+
 
 /* ================= COUNTING ================= */
 let countingChannelId = null;
@@ -161,6 +163,30 @@ function parseTime(time) {
   }
 }
 
+/* 💜 SERVER BOOST DETECTION */
+client.on("guildMemberUpdate", (oldMember, newMember) => {
+  // Detect new boost
+  if (!oldMember.premiumSince && newMember.premiumSince) {
+    const channel = newMember.guild.channels.cache.get(BOOST_CHANNEL_ID);
+    if (!channel) return;
+
+    const embed = new EmbedBuilder()
+      .setTitle("💜 Server Boosted!")
+      .setDescription(
+        `🚀 **Thank you ${newMember}!**\n\n` +
+        "Your server boost helps **Lake County Roleplay** grow and unlock awesome perks for everyone!\n\n" +
+        "We truly appreciate your support 💙"
+      )
+      .setThumbnail(newMember.user.displayAvatarURL({ dynamic: true }))
+      .setColor(0xF47FFF) // boost pink
+      .setTimestamp();
+
+    channel.send({
+      content: `💜 ${newMember} just boosted the server!`,
+      embeds: [embed]
+    });
+  }
+});
 
 /* ================= MESSAGE HANDLER ================= */
 client.on("messageCreate", async (message) => {
@@ -221,6 +247,32 @@ client.on("messageCreate", async (message) => {
 
     await Promise.all(promises);
   }
+
+  /* 🧪 TEST BOOST MESSAGE */
+if (message.content === "!testboost") {
+  if (!message.member.roles.cache.has(ANNOUNCEMENT_ROLE_ID))
+    return message.reply("❌ You are not authorized to use this command.");
+
+  const channel = message.guild.channels.cache.get("1467596304900292869");
+  if (!channel) return message.reply("❌ Boost channel not found.");
+
+  const embed = new EmbedBuilder()
+    .setTitle("💜 Server Boosted!")
+    .setDescription(
+      `🚀 **Thank you ${message.author}!**\n\n` +
+      "Your boost helps **Lake County Roleplay** grow and unlock awesome perks for everyone!\n\n" +
+      "We truly appreciate your support 💙"
+    )
+    .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
+    .setColor(0xF47FFF)
+    .setFooter({ text: "Lake County Roleplay" })
+    .setTimestamp();
+
+  channel.send({
+    content: `💜 ${message.author} just boosted the server! *(TEST MESSAGE)*`,
+    embeds: [embed]
+  });
+}
 
   /* 🎉 GIVEAWAY */
 if (message.content.startsWith("!giveaway")) {
